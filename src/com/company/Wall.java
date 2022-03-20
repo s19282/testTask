@@ -17,24 +17,15 @@ public class Wall implements Structure {
     public void setBlocks(List blocks) {
         this.blocks = blocks;
     }
-
+//TODO: check with more test elements
     @Override
     public Optional findBlockByColor(String color) {
         List matchColourBlocks;
-        if(!blocks.isEmpty()) {
+        for (Object block : blocks) {
             try {
-                List hmm = (List)blocks.get(0).getClass().getMethod("getBlocks").invoke(blocks.get(0));
-                hmm.forEach(block -> {
-                    try {
-                        block.getClass().getMethod("getColor").invoke(block);
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    }
-                });
+                System.out.println("a");
+                List hmm = (List)block.getClass().getMethod("getBlocks").invoke(blocks.get(0));
+                block.getClass().getMethod("getColor").invoke(blocks.get(0));
 
             } catch (NoSuchMethodException e) {
                 e.printStackTrace();
@@ -44,17 +35,6 @@ public class Wall implements Structure {
                 e.printStackTrace();
             }
         }
-
-        //        List<Class<? extends CompositeBlock>> list = new ArrayList<>();
-//        blocks.getClass().getInterfaces()[0].getMethod("getBlocks")
-//        for (Class<? extends CompositeBlock> el : blocks)
-//        blocks.forEach(compositeBlock -> compositeBlock.getBlocks().forEach(block -> {
-//            if(block.getColor().equals(color)) matchColourBlocks.add(block);
-//        }));
-//        if(matchColourBlocks.isEmpty())
-//            return Optional.empty();
-//        else
-//            return Optional.of(matchColourBlocks);
         return null;
     }
 
