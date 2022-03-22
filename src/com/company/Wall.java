@@ -25,16 +25,21 @@ public class Wall implements Structure {
         }
         else
         {
-            String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces().);
+            String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
+            System.out.println(interfaces);
             Pattern patternBlock = Pattern.compile("interface com\\.company\\.Block");
-            Pattern patternCompositeBlock = Pattern.compile("interface com\\.company\\.CompositeBlock");
+            Pattern patternCompositeBlock = Pattern.compile(".+interface com\\.company\\.CompositeBlock.+");
             Matcher matcher = patternCompositeBlock.matcher(interfaces);
             if(matcher.matches())
             {
                 for (Object block : blocks) {
                     try {
-                        Object getBlocks = block.getClass().getMethod("getBlocks").invoke(block);
-                        if(color.equals(c)) {
+                        List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
+                        for(Object o : getBlocks)
+                        {
+                            System.out.println(o.getClass().getMethod("getColor").invoke(o));
+                        }
+                        if(color.equals(getBlocks)) {
                             return Optional.of(block);
                         }
                     } catch (NoSuchMethodException e) {
@@ -63,6 +68,7 @@ public class Wall implements Structure {
                         e.printStackTrace();
                     }
                 }
+                return Optional.empty();
             }
             else
             {
