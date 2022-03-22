@@ -1,11 +1,11 @@
 package com.company;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Wall implements Structure {
     private List blocks;
@@ -17,25 +17,58 @@ public class Wall implements Structure {
     public void setBlocks(List blocks) {
         this.blocks = blocks;
     }
-//TODO: check with more test elements
     @Override
     public Optional findBlockByColor(String color) {
-        List matchColourBlocks;
-        for (Object block : blocks) {
-            try {
-                System.out.println("a");
-                List hmm = (List)block.getClass().getMethod("getBlocks").invoke(blocks.get(0));
-                block.getClass().getMethod("getColor").invoke(blocks.get(0));
-
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
+        if(blocks.isEmpty())
+        {
+            return Optional.empty();
+        }
+        else
+        {
+            String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces().);
+            Pattern patternBlock = Pattern.compile("interface com\\.company\\.Block");
+            Pattern patternCompositeBlock = Pattern.compile("interface com\\.company\\.CompositeBlock");
+            Matcher matcher = patternCompositeBlock.matcher(interfaces);
+            if(matcher.matches())
+            {
+                for (Object block : blocks) {
+                    try {
+                        Object getBlocks = block.getClass().getMethod("getBlocks").invoke(block);
+                        if(color.equals(c)) {
+                            return Optional.of(block);
+                        }
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            matcher = patternBlock.matcher(interfaces);
+            if(matcher.matches())
+            {
+                for (Object block : blocks) {
+                    try {
+                        String c = block.getClass().getMethod("getColor").invoke(block).toString();
+                        if(color.equals(c)) {
+                            return Optional.of(block);
+                        }
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            else
+            {
+                return Optional.empty();
             }
         }
-        return null;
     }
 
     @Override
