@@ -124,24 +124,18 @@ public class Wall implements Structure {
     public int count() {
         int counter = 0;
         if (!blocks.isEmpty()) {
-            String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
-            System.out.println(interfaces);
-            Pattern patternBlock = Pattern.compile(".+interface com\\.company\\.Block.+");
-            Pattern patternCompositeBlock = Pattern.compile(".+interface com\\.company\\.CompositeBlock.+");
-            Matcher matcher = patternCompositeBlock.matcher(interfaces);
-            if (matcher.matches()) {
-                for (Object block : blocks) {
-                    try {
-                        List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
-                        counter += getBlocks.size();
-                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                        e.printStackTrace();
+            switch (getInterface()) {
+                case "CompositeBlock" -> {
+                    for (Object block : blocks) {
+                        try {
+                            List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
+                            counter += getBlocks.size();
+                        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
-            matcher = patternBlock.matcher(interfaces);
-            if (matcher.matches()) {
-                counter = blocks.size();
+                case "Block" -> counter = blocks.size();
             }
         }
         return counter;
@@ -154,7 +148,7 @@ public class Wall implements Structure {
         } else if (interfaces.contains("interface com\\.company\\.Block")) {
             return "Block";
         } else {
-            return null;
+            return "";
         }
     }
 }
