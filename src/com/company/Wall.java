@@ -123,8 +123,8 @@ public class Wall implements Structure {
     @Override
     public int count() {
         int counter = 0;
-        if (!blocks.isEmpty()) {
-            switch (getInterface()) {
+        if (!blocks.isEmpty() && getInterface().isPresent()) {
+            switch (getInterface().get()) {
                 case "CompositeBlock" -> {
                     for (Object block : blocks) {
                         try {
@@ -141,14 +141,14 @@ public class Wall implements Structure {
         return counter;
     }
 
-    private String getInterface() {
+    private Optional<String> getInterface() {
         String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
         if (interfaces.contains("interface com\\.company\\.CompositeBlock")) {
-            return "CompositeBlock";
+            return Optional.of("CompositeBlock");
         } else if (interfaces.contains("interface com\\.company\\.Block")) {
-            return "Block";
+            return Optional.of("Block");
         } else {
-            return "";
+            return Optional.empty();
         }
     }
 }
