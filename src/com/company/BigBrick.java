@@ -23,4 +23,11 @@ public class BigBrick implements CompositeBlock{
     public List getBlocks() {
         return blocks;
     }
+
+    @Override
+    public String toString() {
+        return "BigBrick{" +
+                "blocks=" + blocks +
+                '}';
+    }
 }

@@ -44,6 +44,6 @@ public class Main {
 //
 //        Wall wall = new Wall();
 //        wall.setBlocks(list);
-        wall.findBlockByColor("c1");
+        System.out.println(wall.findBlockByColor("c1").get());
     }
 }

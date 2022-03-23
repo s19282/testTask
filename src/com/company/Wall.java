@@ -27,7 +27,7 @@ public class Wall implements Structure {
         {
             String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
             System.out.println(interfaces);
-            Pattern patternBlock = Pattern.compile("interface com\\.company\\.Block");
+            Pattern patternBlock = Pattern.compile(".+interface com\\.company\\.Block.+");
             Pattern patternCompositeBlock = Pattern.compile(".+interface com\\.company\\.CompositeBlock.+");
             Matcher matcher = patternCompositeBlock.matcher(interfaces);
             if(matcher.matches())
@@ -37,10 +37,10 @@ public class Wall implements Structure {
                         List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
                         for(Object o : getBlocks)
                         {
-                            System.out.println(o.getClass().getMethod("getColor").invoke(o));
-                        }
-                        if(color.equals(getBlocks)) {
-                            return Optional.of(block);
+                            String c = o.getClass().getMethod("getColor").invoke(o).toString();
+                            if(color.equals(c)) {
+                                return Optional.of(o);
+                            }
                         }
                     } catch (NoSuchMethodException e) {
                         e.printStackTrace();
@@ -57,6 +57,7 @@ public class Wall implements Structure {
                 for (Object block : blocks) {
                     try {
                         String c = block.getClass().getMethod("getColor").invoke(block).toString();
+                        System.out.println("color: "+c);
                         if(color.equals(c)) {
                             return Optional.of(block);
                         }
@@ -68,12 +69,8 @@ public class Wall implements Structure {
                         e.printStackTrace();
                     }
                 }
-                return Optional.empty();
             }
-            else
-            {
-                return Optional.empty();
-            }
+            return Optional.empty();
         }
     }
 

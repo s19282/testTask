@@ -21,4 +21,12 @@ public class Brick implements Block{
     public String getMaterial() {
         return material;
     }
+
+    @Override
+    public String toString() {
+        return "Brick{" +
+                "color='" + color + '\'' +
+                ", material='" + material + '\'' +
+                '}';
+    }
 }
