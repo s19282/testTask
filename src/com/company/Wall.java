@@ -1,6 +1,7 @@
 package com.company;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -17,28 +18,24 @@ public class Wall implements Structure {
     public void setBlocks(List blocks) {
         this.blocks = blocks;
     }
+
     @Override
     public Optional findBlockByColor(String color) {
-        if(blocks.isEmpty())
-        {
+        if (blocks.isEmpty()) {
             return Optional.empty();
-        }
-        else
-        {
+        } else {
             String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
             System.out.println(interfaces);
             Pattern patternBlock = Pattern.compile(".+interface com\\.company\\.Block.+");
             Pattern patternCompositeBlock = Pattern.compile(".+interface com\\.company\\.CompositeBlock.+");
             Matcher matcher = patternCompositeBlock.matcher(interfaces);
-            if(matcher.matches())
-            {
+            if (matcher.matches()) {
                 for (Object block : blocks) {
                     try {
                         List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
-                        for(Object o : getBlocks)
-                        {
+                        for (Object o : getBlocks) {
                             String c = o.getClass().getMethod("getColor").invoke(o).toString();
-                            if(color.equals(c)) {
+                            if (color.equals(c)) {
                                 return Optional.of(o);
                             }
                         }
@@ -52,13 +49,12 @@ public class Wall implements Structure {
                 }
             }
             matcher = patternBlock.matcher(interfaces);
-            if(matcher.matches())
-            {
+            if (matcher.matches()) {
                 for (Object block : blocks) {
                     try {
                         String c = block.getClass().getMethod("getColor").invoke(block).toString();
-                        System.out.println("color: "+c);
-                        if(color.equals(c)) {
+                        System.out.println("color: " + c);
+                        if (color.equals(c)) {
                             return Optional.of(block);
                         }
                     } catch (NoSuchMethodException e) {
@@ -76,20 +72,80 @@ public class Wall implements Structure {
 
     @Override
     public List findBlocksByMaterial(String material) {
-        List matchMaterialBlocks;
-//        blocks.forEach(compositeBlock -> compositeBlock.getBlocks().forEach(block -> {
-//            if(block.getMaterial().equals(material)) matchMaterialBlocks.add(block);
-//        }));
-//        return matchMaterialBlocks;
-        return null;
+        List matchMaterialBlocks = new ArrayList();
+        if (!blocks.isEmpty()) {
+            String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
+            System.out.println(interfaces);
+            Pattern patternBlock = Pattern.compile(".+interface com\\.company\\.Block.+");
+            Pattern patternCompositeBlock = Pattern.compile(".+interface com\\.company\\.CompositeBlock.+");
+            Matcher matcher = patternCompositeBlock.matcher(interfaces);
+            if (matcher.matches()) {
+                matchMaterialBlocks.clear();
+                for (Object block : blocks) {
+                    try {
+                        List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
+                        for (Object o : getBlocks) {
+                            String m = o.getClass().getMethod("getMaterial").invoke(o).toString();
+                            if (material.equals(m)) {
+                                matchMaterialBlocks.add(o);
+                            }
+                        }
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            matcher = patternBlock.matcher(interfaces);
+            if (matcher.matches()) {
+                matchMaterialBlocks.clear();
+                for (Object block : blocks) {
+                    try {
+                        String m = block.getClass().getMethod("getMaterial").invoke(block).toString();
+                        System.out.println("color: " + m);
+                        if (material.equals(m)) {
+                            matchMaterialBlocks.add(block);
+                        }
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        return matchMaterialBlocks;
     }
 
     @Override
     public int count() {
-        int counter=0;
-//        for (Object compositeBlock : blocks) {
-//            counter+=compositeBlock.getBlocks().size();
-//        }
+        int counter = 0;
+        if (!blocks.isEmpty()) {
+            String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
+            System.out.println(interfaces);
+            Pattern patternBlock = Pattern.compile(".+interface com\\.company\\.Block.+");
+            Pattern patternCompositeBlock = Pattern.compile(".+interface com\\.company\\.CompositeBlock.+");
+            Matcher matcher = patternCompositeBlock.matcher(interfaces);
+            if (matcher.matches()) {
+                for (Object block : blocks) {
+                    try {
+                        List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
+                            counter+=getBlocks.size();
+                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            matcher = patternBlock.matcher(interfaces);
+            if (matcher.matches()) {
+                counter= blocks.size();
+            }
+        }
         return counter;
     }
 }

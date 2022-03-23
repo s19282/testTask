@@ -17,7 +17,7 @@ public class Main {
         b3.setMaterial("m3");
         Brick b4 = new Brick();
         b4.setColor("c4");
-        b4.setMaterial("m3");
+        b4.setMaterial("m1");
 
 
         BigBrick bb1 = new BigBrick();
@@ -37,6 +37,8 @@ public class Main {
         Wall wall = new Wall();
         wall.setBlocks(l1);
 
+        System.out.println(wall.findBlocksByMaterial("m1"));
+
 //        List<Brick> list = new ArrayList<>();
 //        list.add(b1);
 //        list.add(b2);
@@ -44,6 +46,6 @@ public class Main {
 //
 //        Wall wall = new Wall();
 //        wall.setBlocks(list);
-        System.out.println(wall.findBlockByColor("c1").get());
+//        System.out.println(wall.findBlockByColor("c1").get());
     }
 }
