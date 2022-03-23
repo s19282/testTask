@@ -38,14 +38,18 @@ public class Main {
         wall.setBlocks(l1);
 
         System.out.println(wall.findBlocksByMaterial("m1"));
+        System.out.println("count: "+wall.count());
 
-//        List<Brick> list = new ArrayList<>();
-//        list.add(b1);
-//        list.add(b2);
-//        list.add(b3);
-//
-//        Wall wall = new Wall();
-//        wall.setBlocks(list);
-//        System.out.println(wall.findBlockByColor("c1").get());
+        System.out.println("============");
+
+        List<Brick> list = new ArrayList<>();
+        list.add(b1);
+        list.add(b2);
+        list.add(b3);
+
+        Wall wall2 = new Wall();
+        wall2.setBlocks(list);
+        System.out.println(wall2.findBlockByColor("c1").get());
+        System.out.println("count "+wall2.count());
     }
 }

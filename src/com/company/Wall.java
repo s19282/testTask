@@ -21,9 +21,7 @@ public class Wall implements Structure {
 
     @Override
     public Optional findBlockByColor(String color) {
-        if (blocks.isEmpty()) {
-            return Optional.empty();
-        } else {
+        if (!blocks.isEmpty()) {
             String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
             System.out.println(interfaces);
             Pattern patternBlock = Pattern.compile(".+interface com\\.company\\.Block.+");
@@ -66,8 +64,8 @@ public class Wall implements Structure {
                     }
                 }
             }
-            return Optional.empty();
         }
+        return Optional.empty();
     }
 
     @Override
@@ -135,7 +133,7 @@ public class Wall implements Structure {
                 for (Object block : blocks) {
                     try {
                         List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
-                            counter+=getBlocks.size();
+                        counter += getBlocks.size();
                     } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
@@ -143,9 +141,20 @@ public class Wall implements Structure {
             }
             matcher = patternBlock.matcher(interfaces);
             if (matcher.matches()) {
-                counter= blocks.size();
+                counter = blocks.size();
             }
         }
         return counter;
+    }
+
+    private String getInterface() {
+        String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
+        if (interfaces.contains("interface com\\.company\\.CompositeBlock")) {
+            return "CompositeBlock";
+        } else if (interfaces.contains("interface com\\.company\\.Block")) {
+            return "Block";
+        } else {
+            return null;
+        }
     }
 }
