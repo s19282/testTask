@@ -37,7 +37,7 @@ public class Main {
         Wall wall = new Wall();
         wall.setBlocks(l1);
 
-        System.out.println(wall.findBlocksByMaterial("m1"));
+        System.out.println("m1: "+wall.findBlocksByMaterial("m1"));
         System.out.println("count: "+wall.count());
 
         System.out.println("============");
@@ -49,7 +49,7 @@ public class Main {
 
         Wall wall2 = new Wall();
         wall2.setBlocks(list);
-        System.out.println(wall2.findBlockByColor("c1").get());
+        System.out.println("c1: "+wall2.findBlockByColor("c1").get());
         System.out.println("count "+wall2.count());
     }
 }

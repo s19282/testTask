@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Wall implements Structure {
     private List blocks;
@@ -21,46 +19,25 @@ public class Wall implements Structure {
 
     @Override
     public Optional findBlockByColor(String color) {
-        if (!blocks.isEmpty()) {
-            String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
-            System.out.println(interfaces);
-            Pattern patternBlock = Pattern.compile(".+interface com\\.company\\.Block.+");
-            Pattern patternCompositeBlock = Pattern.compile(".+interface com\\.company\\.CompositeBlock.+");
-            Matcher matcher = patternCompositeBlock.matcher(interfaces);
-            if (matcher.matches()) {
-                for (Object block : blocks) {
-                    try {
-                        List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
+        if (!blocks.isEmpty() && getInterface().isPresent()) {
+            switch (getInterface().get()) {
+                case "CompositeBlock" -> {
+                    for (Object block : blocks) {
+                        List getBlocks = invokeCompositeBlockMethod(block, "getBlocks");
                         for (Object o : getBlocks) {
-                            String c = o.getClass().getMethod("getColor").invoke(o).toString();
+                            String c = invokeBlockMethod(o, "getColor");
                             if (color.equals(c)) {
                                 return Optional.of(o);
                             }
                         }
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
                     }
                 }
-            }
-            matcher = patternBlock.matcher(interfaces);
-            if (matcher.matches()) {
-                for (Object block : blocks) {
-                    try {
-                        String c = block.getClass().getMethod("getColor").invoke(block).toString();
-                        System.out.println("color: " + c);
+                case "Block" -> {
+                    for (Object block : blocks) {
+                        String c = invokeBlockMethod(block, "getColor");
                         if (color.equals(c)) {
                             return Optional.of(block);
                         }
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
                     }
                 }
             }
@@ -71,48 +48,25 @@ public class Wall implements Structure {
     @Override
     public List findBlocksByMaterial(String material) {
         List matchMaterialBlocks = new ArrayList();
-        if (!blocks.isEmpty()) {
-            String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
-            System.out.println(interfaces);
-            Pattern patternBlock = Pattern.compile(".+interface com\\.company\\.Block.+");
-            Pattern patternCompositeBlock = Pattern.compile(".+interface com\\.company\\.CompositeBlock.+");
-            Matcher matcher = patternCompositeBlock.matcher(interfaces);
-            if (matcher.matches()) {
-                matchMaterialBlocks.clear();
-                for (Object block : blocks) {
-                    try {
-                        List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
+        if (!blocks.isEmpty() && getInterface().isPresent()) {
+            switch (getInterface().get()) {
+                case "CompositeBlock" -> {
+                    for (Object block : blocks) {
+                        List getBlocks = invokeCompositeBlockMethod(block, "getBlocks");
                         for (Object o : getBlocks) {
-                            String m = o.getClass().getMethod("getMaterial").invoke(o).toString();
+                            String m = invokeBlockMethod(o, "getMaterial");
                             if (material.equals(m)) {
                                 matchMaterialBlocks.add(o);
                             }
                         }
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
                     }
                 }
-            }
-            matcher = patternBlock.matcher(interfaces);
-            if (matcher.matches()) {
-                matchMaterialBlocks.clear();
-                for (Object block : blocks) {
-                    try {
-                        String m = block.getClass().getMethod("getMaterial").invoke(block).toString();
-                        System.out.println("color: " + m);
+                case "Block" -> {
+                    for (Object block : blocks) {
+                        String m = invokeBlockMethod(block, "getMaterial");
                         if (material.equals(m)) {
                             matchMaterialBlocks.add(block);
                         }
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
                     }
                 }
             }
@@ -127,12 +81,8 @@ public class Wall implements Structure {
             switch (getInterface().get()) {
                 case "CompositeBlock" -> {
                     for (Object block : blocks) {
-                        try {
-                            List getBlocks = (List) block.getClass().getMethod("getBlocks").invoke(block);
-                            counter += getBlocks.size();
-                        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                            e.printStackTrace();
-                        }
+                        List getBlocks = invokeCompositeBlockMethod(block, "getBlocks");
+                        counter += getBlocks.size();
                     }
                 }
                 case "Block" -> counter = blocks.size();
@@ -143,12 +93,32 @@ public class Wall implements Structure {
 
     private Optional<String> getInterface() {
         String interfaces = Arrays.toString(blocks.get(0).getClass().getInterfaces());
-        if (interfaces.contains("interface com\\.company\\.CompositeBlock")) {
+        if (interfaces.contains("interface com.company.CompositeBlock")) {
             return Optional.of("CompositeBlock");
-        } else if (interfaces.contains("interface com\\.company\\.Block")) {
+        } else if (interfaces.contains("interface com.company.Block")) {
             return Optional.of("Block");
         } else {
             return Optional.empty();
         }
+    }
+
+    private String invokeBlockMethod(Object object, String methodName) {
+        String value = "";
+        try {
+            value = object.getClass().getMethod(methodName).invoke(object).toString();
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return value;
+    }
+
+    private List invokeCompositeBlockMethod(Object object, String methodName) {
+        List list = new ArrayList();
+        try {
+            list = (List) object.getClass().getMethod(methodName).invoke(object);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }
